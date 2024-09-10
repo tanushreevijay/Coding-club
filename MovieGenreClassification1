@@ -1,0 +1,21 @@
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report, accuracy_score
+from sklearn.naive_bayes import MultinomialNB
+import pandas as pd
+# first, I'm gonna have to collect the data (import the kaggle file) to use in my code
+# and to do that, I have to convert the file to a csv file and read it 
+df = pd.read_csv('imdb movies.csv')
+# now i have to load it into the pandas dataframe for preprocessing
+df = df[['plot', 'genre']]
+# i must vectorize the colums of the csv file to be able to classify it, so i'll do that using the tf-idf method(term frequency)
+tfidf = TfidfVectorizer(stop_words='english') # i've used this to remove the stopwords as they provide no context to the movie genres, therefore making this process of classification easier for me
+X = tfidf.fit_transform(df['plot'])
+X_train, X_test, y_train, y_test = train_test_split(X, df['genre'], test_size=0.2, random_state=42) # i am now seperating the data and training the models. here, im also saying that 20% of the dataset will be used for testing and 80% for training
+clf = MultinomialNB() # here i'm initializing Naive Bayes model for classification
+clf.fit(X_train, y_train) # this is for the model to learn from the training data
+y_pred = clf.predict(X_test) # to predict the genre of the test data
+accuracy = accuracy_score(y_test, y_pred)
+print(f'The accuracy is: {accuracy}')
+print(classification_report(y_test, y_pred))
